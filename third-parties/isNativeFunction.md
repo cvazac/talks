@@ -101,7 +101,7 @@ Outside of fat arrow functions (which won't work in this case because `this`), t
       return false
     }
     
-    if (serialized.indexOf('return') !== -1) {
+    if (/return/.test(serialized)) {
       // if the serialized version of `Function.prototype.toString` contains 'return', we've been patched
       return false
     }
