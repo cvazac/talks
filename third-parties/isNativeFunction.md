@@ -122,6 +122,37 @@ iframe.contentWindow.Function.prototype.toString // <-- let's use this
 iframe.parentNode.removeChild(iframe)
 ```
 ##### isNativeFunction #3:
-[Putting it all together](https://gist.github.com/cvazac/d67c8d960e977efce1c62d22180350f1)
+```javascript
+const isNativeFunction = (function() {
+  var nativeToString
+  function nativeFunctionPrototypeToString() {
+    var toString = Function.prototype.toString
+    var serialized = toString.call(toString)
+    return (function(){}).toString() !== serialized &&
+      /return/.test(serialized)
+  }
 
-The clever reader will notice that we are using `.call()` in two spots - to avoid `toString` interlopers on the argument to `.call()`. Because `Function.prototype.call` itself can be patched, and it can not be polyfilled with native javascript, we have to work around it by deleting and restoring any `toString` methods that sit in our way. We will leave that as an exercise for the reader. 
+  return function(fn) {
+    if (!nativeToString) {
+      if (nativeFunctionPrototypeToString()) {
+        nativeToString = Function.prototype.toString
+      } else {
+        var iframe = document.createElement('iframe')
+        iframe.style.display = 'none'
+        iframe.src = 'javascript:false'
+        document.getElementsByTagName('script')[0].parentNode.appendChild(iframe)
+
+        nativeToString = iframe.contentWindow.Function.prototype.toString
+        iframe.parentNode.removeChild(iframe)
+      }
+    }
+
+    return typeof fn === 'function' &&
+      /\[native code\]/.test(nativeToString.call(fn))
+  }
+})()
+```
+
+The clever reader will notice that we are using `.call()` in two spots - to avoid `toString` interlopers on the argument we pass to `.call()`. Because `Function.prototype.call` itself can be patched, and it can not be polyfilled with native javascript, we have to work around it by deleting and restoring any `toString` methods that sit in our way. We will leave that as an exercise for the reader. 
+
+We are also using `RegExp.prototype.test`. But what lunatic would override that black magic?
