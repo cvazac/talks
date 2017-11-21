@@ -96,7 +96,7 @@ Outside of fat arrow functions (which won't work in this case because `this`), t
     // serialize it, using only itself
     var serialized = toString.call(toString)
 
-    if (toString.call(function(){}) === serialized) {
+    if ((function(){}).toString() === serialized) {
       // if these two are the same, we've been patched
       return false
     }
