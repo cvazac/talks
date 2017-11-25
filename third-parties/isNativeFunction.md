@@ -46,7 +46,7 @@ window.XMLHttpRequest = function() { /* ... */ }
 window.XMLHttpRequest.toString = function() {
   return '[native code]'
 }
-isNativeFunction(XMLHttpRequest) // true
+isNativeFunction(XMLHttpRequest) // false
 ```
 
 But it, too, can be defeated:
